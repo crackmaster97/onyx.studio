@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS STUDIO — Software de Alta Gama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050509;
+  --bg2: #08080f;
+  --glass: rgba(255,255,255,0.028);
+  --glass2: rgba(255,255,255,0.055);
+  --border: rgba(255,255,255,0.07);
+  --tx1: #eaeaf5;
+  --tx2: #8888a8;
+  --tx3: #3f3f58;
+  --ac: #00e89b;
+  --ac-dim: rgba(0,232,155,0.12);
+  --ac-glow: rgba(0,232,155,0.25);
+  --ac-border: rgba(0,232,155,0.35);
+  --ac-rgb: 0,232,155;
+  --transition: 0.55s cubic-bezier(0.4,0,0.2,1);
+}
+body.app-mode {
+  --ac: #b44fff;
+  --ac-dim: rgba(180,79,255,0.12);
+  --ac-glow: rgba(180,79,255,0.25);
+  --ac-border: rgba(180,79,255,0.35);
+  --ac-rgb: 180,79,255;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--tx1);
+  font-family:'Outfit',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+  min-height:100vh;
+  transition:--ac var(--transition);
+}
+
+/* ── GRAIN TEXTURE ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity:.5;
+}
+
+/* ── GRID LINES ── */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(var(--ac-rgb),.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(var(--ac-rgb),.025) 1px,transparent 1px);
+  background-size:72px 72px;
+  transition:background-image var(--transition);
+}
+
+/* ── ORBS ── */
+.orb{
+  position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;
+  transition:background var(--transition);
+}
+.orb1{
+  width:620px;height:620px;top:-180px;right:-160px;
+  background:radial-gradient(circle,rgba(var(--ac-rgb),.12),transparent 70%);
+}
+.orb2{
+  width:450px;height:450px;bottom:5%;left:-120px;
+  background:radial-gradient(circle,rgba(var(--ac-rgb),.07),transparent 70%);
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--ac-border);border-radius:99px}
+
+/* ─────────────────────────────────────
+   NAV
+───────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:70px;padding:0 2.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(5,5,9,.75);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  transition:border-color var(--transition);
+}
+.logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.45rem;font-weight:400;
+  letter-spacing:.35em;text-transform:uppercase;
+  color:var(--tx1);text-decoration:none;
+}
+.logo em{color:var(--ac);font-style:normal;transition:color var(--transition)}
+
+.nav-links{
+  display:flex;gap:2.5rem;list-style:none;
+}
+.nav-links a{
+  color:var(--tx2);text-decoration:none;
+  font-size:.72rem;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;
+  transition:color .25s;
+}
+.nav-links a:hover{color:var(--ac)}
+
+/* ── MODE SWITCH ── */
+.switch-wrap{
+  display:flex;align-items:center;gap:.7rem;
+}
+.switch-side-label{
+  font-size:.68rem;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ac);
+  min-width:32px;
+  transition:color var(--transition);
+}
+.switch-track{
+  position:relative;width:62px;height:30px;
+  border:1px solid var(--ac-border);border-radius:99px;
+  background:var(--ac-dim);cursor:pointer;
+  transition:border-color var(--transition),background var(--transition);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 7px;
+  user-select:none;
+}
+.switch-track-icons{
+  display:flex;justify-content:space-between;width:100%;
+  position:absolute;left:0;right:0;padding:0 6px;
+  font-size:10px;color:rgba(255,255,255,.3);pointer-events:none;
+}
+.switch-thumb{
+  position:absolute;left:3px;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--ac);
+  box-shadow:0 0 10px var(--ac-glow);
+  transition:left .4s cubic-bezier(.34,1.56,.64,1),background var(--transition),box-shadow var(--transition);
+}
+.switch-track.on .switch-thumb{left:35px}
+
+/* ─────────────────────────────────────
+   HERO
+───────────────────────────────────── */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  justify-content:center;text-align:center;
+  padding:8rem 2rem 5rem;
+  position:relative;z-index:1;
+}
+.hero-inner{max-width:820px;margin:0 auto}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.38rem 1.25rem;
+  border:1px solid var(--ac-border);border-radius:99px;
+  background:var(--ac-dim);
+  font-size:.68rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ac);margin-bottom:2.5rem;
+  transition:all var(--transition);
+}
+
+.hero-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3.2rem,8.5vw,7.5rem);
+  font-weight:300;line-height:1.04;
+  letter-spacing:.04em;color:var(--tx1);
+  margin-bottom:1.5rem;
+}
+.hero-title em{
+  font-style:italic;color:var(--ac);
+  transition:color var(--transition);
+}
+
+.hero-sub{
+  font-size:.98rem;font-weight:300;
+  color:var(--tx2);max-width:500px;
+  margin:0 auto 3rem;line-height:1.9;
+  letter-spacing:.02em;
+}
+
+.cta-group{
+  display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;
+}
+
+.btn-prim{
+  padding:.88rem 2.5rem;
+  background:var(--ac);color:#050509;
+  border:none;border-radius:3px;
+  font-family:'Outfit',sans-serif;
+  font-size:.75rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+  cursor:pointer;
+  box-shadow:0 0 22px var(--ac-glow);
+  transition:all .3s ease;
+}
+.btn-prim:hover{transform:translateY(-2px);box-shadow:0 0 34px var(--ac-glow)}
+
+.btn-ghost{
+  padding:.88rem 2.5rem;
+  background:transparent;color:var(--tx1);
+  border:1px solid var(--border);border-radius:3px;
+  font-family:'Outfit',sans-serif;
+  font-size:.75rem;font-weight:500;
+  letter-spacing:.2em;text-transform:uppercase;
+  cursor:pointer;transition:all .3s;
+}
+.btn-ghost:hover{border-color:var(--ac-border);color:var(--ac)}
+
+/* ─────────────────────────────────────
+   SECTION
+───────────────────────────────────── */
+.section{
+  padding:5.5rem 2.5rem;
+  position:relative;z-index:1;
+}
+.sec-eyebrow{
+  font-size:.68rem;font-weight:500;
+  letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ac);margin-bottom:.85rem;
+  transition:color var(--transition);
+}
+.glow-line{
+  width:48px;height:1px;
+  background:var(--ac);
+  box-shadow:0 0 8px var(--ac-glow);
+  margin:0 auto 2rem;
+  transition:background var(--transition),box-shadow var(--transition);
+}
+.glow-line.left{margin-left:0}
+.sec-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.9rem,4vw,3.4rem);
+  font-weight:300;letter-spacing:.04em;
+  color:var(--tx1);margin-bottom:1rem;
+}
+.sec-desc{
+  color:var(--tx2);font-size:.92rem;
+  max-width:480px;margin:0 auto;line-height:1.9;
+}
+
+/* ─────────────────────────────────────
+   PRODUCTS GRID
+───────────────────────────────────── */
+.products-wrap{max-width:1340px;margin:0 auto}
+.sec-header{text-align:center;margin-bottom:4rem}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.4rem;
+}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.grid{grid-template-columns:1fr}}
+
+/* ── CARD ── */
+.card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:1.7rem;
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:1.15rem;
+  transition:border-color .35s,transform .35s,box-shadow .35s;
+}
+.card::after{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--ac-border),transparent);
+  opacity:0;transition:opacity .35s,background var(--transition);
+}
+.card:hover{
+  border-color:var(--ac-border);
+  transform:translateY(-5px);
+  box-shadow:0 12px 40px rgba(var(--ac-rgb),.12);
+}
+.card:hover::after{opacity:1}
+
+.card-top{position:relative;padding-right:70px}
+.card-icon{
+  font-size:1.5rem;margin-bottom:.3rem;
+  color:rgba(var(--ac-rgb),.7);
+  transition:color var(--transition);
+}
+.card-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.38rem;font-weight:600;
+  color:var(--tx1);letter-spacing:.02em;
+  margin-bottom:.25rem;
+}
+.card-desc{
+  font-size:.8rem;color:var(--tx2);line-height:1.75;
+}
+.base-tag{
+  position:absolute;top:0;right:0;text-align:right;
+}
+.base-tag span{
+  display:block;font-size:.6rem;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);
+}
+.base-tag strong{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.2rem;font-weight:600;color:var(--tx2);
+}
+
+.divider{height:1px;background:var(--border)}
+
+/* ── UPGRADES ── */
+.upgrades-lbl,.support-lbl{
+  font-size:.6rem;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--tx3);margin-bottom:.65rem;
+}
+.upg-item{
+  display:flex;align-items:flex-start;gap:.7rem;
+  margin-bottom:.55rem;cursor:pointer;
+}
+.upg-check{
+  width:15px;height:15px;
+  border:1px solid var(--border);border-radius:3px;
+  background:transparent;appearance:none;-webkit-appearance:none;
+  cursor:pointer;position:relative;flex-shrink:0;margin-top:2px;
+  transition:all .2s;
+}
+.upg-check:checked{background:var(--ac);border-color:var(--ac)}
+.upg-check:checked::after{
+  content:'✓';position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  color:#050509;font-size:9px;font-weight:800;
+}
+.upg-name{font-size:.79rem;color:var(--tx2);display:block}
+.upg-price{
+  font-size:.72rem;color:var(--ac);font-weight:500;
+  transition:color var(--transition);
+}
+
+/* ── SUPPORT ── */
+.support-btns{display:flex;gap:.5rem}
+.sup-btn{
+  flex:1;padding:.42rem .2rem;
+  background:transparent;
+  border:1px solid var(--border);border-radius:3px;
+  color:var(--tx2);
+  font-family:'Outfit',sans-serif;
+  font-size:.62rem;font-weight:500;
+  cursor:pointer;letter-spacing:.04em;
+  transition:all .2s;
+}
+.sup-btn:hover{border-color:var(--ac-border);color:var(--ac)}
+.sup-btn.active{
+  background:var(--ac-dim);
+  border-color:var(--ac-border);
+  color:var(--ac);
+}
+
+/* ── PRICE DISPLAY ── */
+.price-box{
+  text-align:center;padding:1rem;
+  background:rgba(var(--ac-rgb),.06);
+  border:1px solid var(--ac-border);
+  border-radius:8px;
+  transition:background var(--transition),border-color var(--transition);
+}
+.price-lbl{
+  font-size:.6rem;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--tx3);margin-bottom:.2rem;
+}
+.price-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.4rem;font-weight:600;
+  color:var(--ac);line-height:1.1;
+  transition:color var(--transition);
+}
+.price-sup-note{
+  font-size:.67rem;color:var(--tx3);margin-top:.35rem;
+}
+@keyframes pop{0%{transform:scale(1.06)}100%{transform:scale(1)}}
+.pop{animation:pop .2s ease-out}
+
+/* ── TERMS ── */
+.terms-btn{
+  background:none;border:none;padding:0;
+  color:var(--tx3);font-family:'Outfit',sans-serif;
+  font-size:.73rem;cursor:pointer;
+  display:flex;align-items:center;gap:.4rem;
+  transition:color .2s;letter-spacing:.05em;
+}
+.terms-btn:hover{color:var(--ac)}
+.terms-arrow{display:inline-block;transition:transform .3s;font-size:.65rem}
+.terms-btn.open .terms-arrow{transform:rotate(180deg)}
+.terms-body{
+  display:none;
+  background:rgba(0,0,0,.28);
+  border:1px solid var(--border);
+  border-radius:8px;padding:.9rem 1.1rem;
+  font-size:.76rem;line-height:1.8;
+}
+.terms-body.open{display:block;animation:fadeIn .3s ease}
+.t-title{
+  font-size:.6rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;margin-bottom:.45rem;
+}
+.t-inc{color:var(--ac)}
+.t-exc{color:#ff6060}
+.t-ul{list-style:none;margin-bottom:.7rem}
+.t-ul li{
+  color:var(--tx2);display:flex;
+  align-items:flex-start;gap:.5rem;margin-bottom:.25rem;font-size:.75rem;
+}
+.t-ul li::before{content:'—';color:var(--tx3);flex-shrink:0}
+
+/* ── HIRE BTN ── */
+.hire-btn{
+  width:100%;padding:.82rem;
+  background:transparent;
+  border:1px solid var(--ac-border);border-radius:3px;
+  color:var(--ac);
+  font-family:'Outfit',sans-serif;
+  font-size:.76rem;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;
+  cursor:pointer;margin-top:auto;
+  transition:all .3s;
+}
+.hire-btn:hover{
+  background:var(--ac);color:#050509;
+  box-shadow:0 0 22px var(--ac-glow);
+}
+
+/* ─────────────────────────────────────
+   ABOUT
+───────────────────────────────────── */
+.about-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:5rem;align-items:center;
+  max-width:1100px;margin:0 auto;
+}
+@media(max-width:768px){.about-grid{grid-template-columns:1fr;gap:3rem}}
+
+.stat-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;
+}
+.stat-card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:10px;padding:1.5rem;
+  text-align:center;
+  transition:border-color var(--transition);
+}
+.stat-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:3rem;font-weight:300;
+  color:var(--ac);line-height:1;
+  transition:color var(--transition);
+}
+.stat-lbl{
+  font-size:.68rem;color:var(--tx3);
+  letter-spacing:.12em;text-transform:uppercase;margin-top:.5rem;
+}
+
+/* ── PROCESS ── */
+.process-strip{
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:3rem 0;margin:0;
+  position:relative;z-index:1;
+}
+.process-inner{
+  max-width:1100px;margin:0 auto;padding:0 2.5rem;
+  display:flex;gap:2rem;justify-content:space-between;flex-wrap:wrap;
+}
+.proc-step{flex:1;min-width:160px;text-align:center}
+.proc-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.5rem;font-weight:300;
+  color:rgba(var(--ac-rgb),.3);
+  transition:color var(--transition);
+  line-height:1;margin-bottom:.5rem;
+}
+.proc-name{
+  font-size:.82rem;font-weight:500;color:var(--tx1);
+  letter-spacing:.05em;margin-bottom:.35rem;
+}
+.proc-desc{font-size:.75rem;color:var(--tx2);line-height:1.7}
+
+/* ─────────────────────────────────────
+   FOOTER
+───────────────────────────────────── */
+footer{
+  border-top:1px solid var(--border);
+  padding:2.5rem;text-align:center;
+  position:relative;z-index:1;
+  background:rgba(5,5,9,.5);
+}
+.footer-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.25rem;letter-spacing:.35em;
+  text-transform:uppercase;color:var(--tx2);
+  display:block;margin-bottom:1rem;
+}
+.footer-logo em{color:var(--ac);font-style:normal;transition:color var(--transition)}
+.footer-links{
+  display:flex;gap:2rem;justify-content:center;
+  list-style:none;margin-bottom:1.5rem;flex-wrap:wrap;
+}
+.footer-links a{
+  color:var(--tx3);text-decoration:none;
+  font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  transition:color .2s;
+}
+.footer-links a:hover{color:var(--ac)}
+.footer-copy{
+  color:var(--tx3);font-size:.72rem;letter-spacing:.06em;
+}
+.footer-copy a{color:var(--ac);text-decoration:none;transition:color var(--transition)}
+
+/* ─────────────────────────────────────
+   MODAL
+───────────────────────────────────── */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(5,5,9,.88);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  z-index:200;
+  display:flex;align-items:center;justify-content:center;padding:2rem;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.overlay.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--bg2);
+  border:1px solid var(--ac-border);
+  border-radius:16px;padding:2.5rem;
+  max-width:480px;width:100%;
+  box-shadow:0 0 70px rgba(var(--ac-rgb),.18);
+  transform:translateY(18px);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),border-color var(--transition),box-shadow var(--transition);
+}
+.overlay.open .modal{transform:translateY(0)}
+.modal-hd{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:2rem;
+}
+.modal-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.85rem;font-weight:300;letter-spacing:.04em;line-height:1.2;
+}
+.modal-close{
+  background:none;border:none;color:var(--tx2);
+  font-size:1.4rem;cursor:pointer;line-height:1;
+  padding:.2rem;transition:color .2s;
+}
+.modal-close:hover{color:var(--tx1)}
+
+.form-grp{margin-bottom:1.15rem}
+.form-lbl{
+  display:block;font-size:.6rem;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--tx3);margin-bottom:.45rem;
+}
+.form-inp{
+  width:100%;
+  background:var(--glass);
+  border:1px solid var(--border);border-radius:5px;
+  padding:.78rem 1rem;
+  color:var(--tx1);
+  font-family:'Outfit',sans-serif;font-size:.88rem;
+  outline:none;transition:border-color .25s;
+  -webkit-appearance:none;
+}
+.form-inp:focus{border-color:var(--ac-border)}
+.form-inp::placeholder{color:var(--tx3)}
+.form-inp option{background:#0f0f1a;color:var(--tx1)}
+
+.form-submit{
+  width:100%;padding:1rem;
+  background:var(--ac);color:#050509;border:none;border-radius:4px;
+  font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;cursor:pointer;
+  margin-top:1.5rem;
+  box-shadow:0 0 24px var(--ac-glow);
+  transition:all .3s;
+}
+.form-submit:hover{transform:translateY(-1px);box-shadow:0 0 38px var(--ac-glow)}
+.form-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+.success-box{
+  text-align:center;padding:2rem 0;display:none;
+}
+.success-icon{
+  font-size:2.5rem;color:var(--ac);margin-bottom:1rem;
+  transition:color var(--transition);
+}
+.success-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.6rem;color:var(--ac);margin-bottom:.5rem;
+  transition:color var(--transition);
+}
+.success-msg{color:var(--tx2);font-size:.88rem;line-height:1.7}
+
+/* ── FLASH ── */
+.flash-layer{
+  position:fixed;inset:0;
+  background:var(--ac);opacity:0;
+  pointer-events:none;z-index:500;
+  transition:opacity .12s;
+}
+.flash-layer.on{opacity:.04}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+.reveal{
+  opacity:0;transform:translateY(24px);
+  transition:opacity .65s ease,transform .65s ease;
+}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── RESPONSIVE NAV ── */
+@media(max-width:768px){
+  .nav-links{display:none}
+  nav{padding:0 1.25rem}
+}
+@media(max-width:480px){
+  .hero{padding:7rem 1.25rem 4rem}
+  .section{padding:4rem 1.25rem}
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="flash-layer" id="flash"></div>
+
+<!-- ═══════════════════════════════════
+     NAV
+════════════════════════════════════ -->
+<nav>
+  <a href="#" class="logo">ONYX<em>.</em>Studio</a>
+
+  <ul class="nav-links">
+    <li><a href="#products">Soluciones</a></li>
+    <li><a href="#process">Proceso</a></li>
+    <li><a href="#about">Nosotros</a></li>
+    <li><a href="#" onclick="openModal('','');return false">Contacto</a></li>
+  </ul>
+
+  <div class="switch-wrap">
+    <span class="switch-side-label" id="sideLabel">Web</span>
+    <div class="switch-track" id="switchTrack" onclick="toggleMode()">
+      <div class="switch-thumb" id="switchThumb"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════
+     HERO
+════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+    <h1 class="hero-title">
+      Construimos el<br>
+      <em id="heroEm">futuro digital</em><br>
+      de tu empresa
+    </h1>
+    <p class="hero-sub" id="heroSub">
+      Soluciones web y mobile de alta gama, diseñadas para marcas que no se conforman con lo ordinario. Cada línea de código es una declaración de excelencia.
+    </p>
+    <div class="cta-group">
+      <button class="btn-prim" onclick="scrollTo('products')">Explorar Soluciones</button>
+      <button class="btn-ghost" onclick="openModal('','')">Agendar Consulta</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     PRODUCTS
+════════════════════════════════════ -->
+<section class="section" id="products">
+  <div class="products-wrap">
+    <div class="sec-header reveal">
+      <div class="sec-eyebrow" id="secEyebrow">Soluciones Web Premium</div>
+      <div class="glow-line"></div>
+      <h2 class="sec-title" id="secTitle">Arquitectura Digital<br>Sin Precedentes</h2>
+      <p class="sec-desc" id="secDesc">Cada proyecto es una obra de ingeniería diseñada para dominar su categoría. Precios transparentes, resultados extraordinarios.</p>
+    </div>
+
+    <div class="grid" id="webGrid"></div>
+    <div class="grid" id="appGrid" style="display:none"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     PROCESS
+════════════════════════════════════ -->
+<div class="process-strip" id="process">
+  <div class="process-inner">
+    <div class="proc-step reveal">
+      <div class="proc-num">01</div>
+      <div class="proc-name">Diagnóstico</div>
+      <div class="proc-desc">Analizamos tu negocio, tus usuarios y el ecosistema competitivo para definir la solución óptima.</div>
+    </div>
+    <div class="proc-step reveal">
+      <div class="proc-num">02</div>
+      <div class="proc-name">Diseño</div>
+      <div class="proc-desc">Prototipado de alta fidelidad con foco en la experiencia de usuario y la identidad de tu marca.</div>
+    </div>
+    <div class="proc-step reveal">
+      <div class="proc-num">03</div>
+      <div class="proc-name">Desarrollo</div>
+      <div class="proc-desc">Ingeniería de software con metodología ágil, revisiones semanales y visibilidad total del avance.</div>
+    </div>
+    <div class="proc-step reveal">
+      <div class="proc-num">04</div>
+      <div class="proc-name">Lanzamiento</div>
+      <div class="proc-desc">Despliegue en infraestructura cloud, pruebas de carga y soporte post-lanzamiento garantizado.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     ABOUT
+════════════════════════════════════ -->
+<section class="section" id="about">
+  <div class="about-grid">
+    <div class="reveal">
+      <div class="sec-eyebrow" style="text-align:left">Sobre Nosotros</div>
+      <div class="glow-line left"></div>
+      <h2 class="sec-title" style="text-align:left;margin-bottom:1.4rem">Artesanos<br>del Software</h2>
+      <p style="color:var(--tx2);line-height:1.95;font-size:.93rem;margin-bottom:1.25rem">
+        En Nexus Studio no desarrollamos proyectos, creamos activos digitales que aprecian con el tiempo. Somos un estudio boutique donde cada cliente recibe atención directa de nuestros seniors.
+      </p>
+      <p style="color:var(--tx2);line-height:1.95;font-size:.93rem">
+        Trabajamos con un portafolio selectivo de clientes para garantizar que cada entregable supere las expectativas más exigentes del mercado global.
+      </p>
+    </div>
+    <div class="stat-grid reveal">
+      <div class="stat-card"><div class="stat-num">48<span style="font-size:1.5rem">+</span></div><div class="stat-lbl">Proyectos Entregados</div></div>
+      <div class="stat-card"><div class="stat-num">8</div><div class="stat-lbl">Años de Excelencia</div></div>
+      <div class="stat-card"><div class="stat-num">97<span style="font-size:1.5rem">%</span></div><div class="stat-lbl">Satisfacción Total</div></div>
+      <div class="stat-card"><div class="stat-num">15</div><div class="stat-lbl">Países Alcanzados</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     FOOTER
+════════════════════════════════════ -->
+<footer>
+  <span class="footer-logo">Nexus<em>.</em>Studio</span>
+  <ul class="footer-links">
+    <li><a href="#products">Soluciones</a></li>
+    <li><a href="#process">Proceso</a></li>
+    <li><a href="#about">Nosotros</a></li>
+    <li><a href="mailto:hola@nexusstudio.dev">Contacto</a></li>
+  </ul>
+  <p class="footer-copy">
+    © 2025 Nexus Studio. Todos los derechos reservados. &nbsp;·&nbsp;
+    <a href="mailto:hola@nexusstudio.dev">hola@nexusstudio.dev</a>
+  </p>
+</footer>
+
+<!-- ═══════════════════════════════════
+     MODAL
+════════════════════════════════════ -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-hd">
+      <h2 class="modal-title">Iniciemos<br>tu proyecto</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="formWrap">
+      <div class="form-grp">
+        <label class="form-lbl">Nombre completo *</label>
+        <input class="form-inp" type="text" id="fName" placeholder="Tu nombre">
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Empresa *</label>
+        <input class="form-inp" type="text" id="fCompany" placeholder="Nombre de tu empresa">
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Servicio de interés</label>
+        <input class="form-inp" type="text" id="fService" placeholder="¿Qué solución te interesa?">
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Presupuesto estimado (USD)</label>
+        <input class="form-inp" type="text" id="fBudget" placeholder="Ej: $5,000">
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Mensaje (opcional)</label>
+        <textarea class="form-inp" id="fMsg" rows="3" placeholder="Cuéntanos brevemente tu proyecto..." style="resize:vertical"></textarea>
+      </div>
+      <button class="form-submit" id="submitBtn" onclick="submitForm()">
+        Enviar Solicitud →
+      </button>
+      <p style="font-size:.68rem;color:var(--tx3);margin-top:.85rem;text-align:center;letter-spacing:.05em">
+        Respuesta garantizada en menos de 24 horas hábiles.
+      </p>
+    </div>
+    <div class="success-box" id="successBox">
+      <div class="success-icon">✦</div>
+      <div class="success-title">¡Solicitud Enviada!</div>
+      <p class="success-msg">Nuestro equipo revisará tu propuesta y se pondrá en contacto dentro de las próximas 24 horas. Bienvenido a Nexus Studio.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   DATA — NUEVOS SERVICIOS
+══════════════════════════════════════════ */
+const WEB = [
+  {
+    icon:'◈', name:'Landing de Conversión',
+    desc:'Página de aterrizaje de alto impacto diseñada con estrategia CRO, copywriting persuasivo, animaciones fluidas y analítica avanzada para maximizar cada visita y convertir tráfico en clientes.',
+    base:1800,
+    upg:[
+      {n:'A/B Testing con IA Adaptativa',p:600},
+      {n:'Integración CRM + Email Automation',p:500},
+      {n:'Multi-idioma (hasta 4 idiomas)',p:400},
+      {n:'Heatmaps y Grabación de Sesiones',p:350},
+    ]
+  },{
+    icon:'◉', name:'Sitio Corporativo',
+    desc:'Portal institucional de presencia premium que proyecta autoridad, solidez y liderazgo. Diseño editorial exclusivo con gestión de contenidos autónoma y seguridad empresarial.',
+    base:5500,
+    upg:[
+      {n:'Portal de Inversores / IR',p:2500},
+      {n:'Sala de Prensa Interactiva',p:1200},
+      {n:'Multilenguaje Avanzado (8+ idiomas)',p:2000},
+      {n:'CDN Global Empresarial',p:900},
+    ]
+  },{
+    icon:'◌', name:'E-commerce',
+    desc:'Tienda online de élite con inventario inteligente, pasarelas de pago globales, experiencias de compra inmersivas y motor de personalización que convierte con precisión quirúrgica.',
+    base:4800,
+    upg:[
+      {n:'App Mobile Companion iOS + Android',p:2200},
+      {n:'Motor de Recomendaciones con IA',p:1300},
+      {n:'Multi-moneda y Multi-región Fiscal',p:900},
+      {n:'Programa de Fidelización Gamificado',p:800},
+    ]
+  },{
+    icon:'⬡', name:'Sistema de Reservas',
+    desc:'Plataforma de reservas y turnos con calendarios inteligentes, recordatorios automatizados, gestión de disponibilidad en tiempo real y panel de administración granular.',
+    base:4200,
+    upg:[
+      {n:'Integración con Google Calendar/Outlook',p:500},
+      {n:'Recordatorios por WhatsApp y SMS',p:700},
+      {n:'Módulo de Pagos y Depósitos',p:800},
+      {n:'App Mobile para Clientes',p:2000},
+    ]
+  },{
+    icon:'◯', name:'Portal de Contenidos',
+    desc:'Hub de contenidos escalable con arquitectura headless CMS, flujos editoriales sofisticados, SEO semántico automatizado y experiencia de lectura multi-dispositivo de clase mundial.',
+    base:6500,
+    upg:[
+      {n:'Migración de Contenido Legacy',p:1500},
+      {n:'Sistema de Paywall y Suscripciones',p:2000},
+      {n:'Newsletter Engine con IA',p:900},
+      {n:'Integración con Redes Sociales y AMP',p:600},
+    ]
+  },{
+    icon:'◫', name:'Web/App a medida',
+    desc:'Desarrollo de software completamente personalizado. Desde plataformas SaaS hasta marketplaces. Una solución esculpida alrededor de tu modelo de negocio sin compromisos.',
+    base:12000,
+    upg:[
+      {n:'Fase de Discovery y Prototipado',p:2500},
+      {n:'Arquitectura de Microservicios',p:4000},
+      {n:'Infraestructura Cloud Multi-Región',p:3000},
+      {n:'Equipo Dedicado de Desarrollo',p:6000},
+    ]
+  }
+];
+
+const APP = [
+  {
+    icon:'◈', name:'Tienda Mobile',
+    desc:'App nativa de comercio electrónico con UX de compra en un paso, escaneo visual de productos, wishlists inteligentes y notificaciones push personalizadas de alto rendimiento.',
+    base:6200,
+    upg:[
+      {n:'Búsqueda Visual con IA',p:2000},
+      {n:'Live Shopping / Streaming Commerce',p:2500},
+      {n:'Programa de Referidos Integrado',p:900},
+      {n:'Realidad Aumentada para Productos',p:1800},
+    ]
+  },{
+    icon:'◉', name:'App de Fidelización',
+    desc:'Programa de lealtad digital gamificado con recompensas, niveles, desafíos y comunidad integrada. Diseñado para aumentar el lifetime value y la retención de clientes.',
+    base:4800,
+    upg:[
+      {n:'Motor de Gamification con Badges',p:700},
+      {n:'Integración POS y CRM',p:900},
+      {n:'Notificaciones Predictivas con ML',p:800},
+      {n:'Portal de Marca Blanca para Partners',p:1500},
+    ]
+  },{
+    icon:'◌', name:'Gestión de Equipos',
+    desc:'Aplicación corporativa para coordinar equipos distribuidos, con chat interno, asignación de tareas, reportería de productividad y control de acceso granular por roles.',
+    base:7500,
+    upg:[
+      {n:'SSO Corporativo (SAML/LDAP)',p:1200},
+      {n:'Videollamadas y Salas de Reunión',p:1800},
+      {n:'GPS, Geofencing y Tracking',p:1000},
+      {n:'Dashboard BI Ejecutivo',p:1500},
+    ]
+  },{
+    icon:'⬡', name:'Sistema de Citas Push',
+    desc:'Plataforma mobile de agendamiento con notificaciones push inteligentes, confirmación instantánea, gestión de colas y recordatorios automáticos para reducir el no-show.',
+    base:3900,
+    upg:[
+      {n:'Integración con Calendarios Nativos',p:500},
+      {n:'Recordatorios por SMS y WhatsApp',p:600},
+      {n:'Módulo de Telemedicina / Videollamada',p:1500},
+      {n:'App para el Profesional / Staff',p:1800},
+    ]
+  },{
+    icon:'◯', name:'App de Membresías',
+    desc:'Aplicación para gestión de membresías y suscripciones con contenido exclusivo, pagos recurrentes, comunidad privada y experiencias VIP para miembros premium.',
+    base:5500,
+    upg:[
+      {n:'Paywall Dinámico y Ofertas',p:800},
+      {n:'Foro y Comunidad Privada',p:1200},
+      {n:'Streaming de Video Integrado',p:2000},
+      {n:'CRM de Miembros con Segmentación',p:900},
+    ]
+  },{
+    icon:'◫', name:'Web/App a medida',
+    desc:'Desarrollo de aplicaciones mobile completamente a medida. Desde apps financieras hasta plataformas de salud. Soluciones nativas o híbridas esculpidas para tu negocio.',
+    base:15000,
+    upg:[
+      {n:'Fase de Discovery y UX Research',p:3000},
+      {n:'Arquitectura Serverless Escalable',p:4500},
+      {n:'CI/CD y DevOps Automatizado',p:2500},
+      {n:'Equipo Dedicado con PM y QA',p:7000},
+    ]
+  }
+];
+
+const TERMS_INCL = [
+  'Despliegue en servidor cloud (AWS / GCP / Azure)',
+  'Certificado SSL y configuración HTTPS completa',
+  'Optimización de velocidad y Core Web Vitals',
+  'Diseño responsive (Desktop, Tablet, Mobile)',
+  'Documentación técnica y manual de uso',
+  '30 días de soporte técnico post-lanzamiento',
+];
+const TERMS_EXCL = [
+  'Costo de dominios y registros DNS',
+  'Redactores o productores de contenido editorial',
+  'Licencias de APIs de terceros (año 2 en adelante)',
+  'Campañas de marketing digital o pauta paga',
+];
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+const states = {};
+let isApp = false;
+
+/* ══════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════ */
+function buildGrid(products, containerId) {
+  const grid = document.getElementById(containerId);
+  grid.innerHTML = '';
+  products.forEach((p,i) => {
+    const id = containerId + '-' + i;
+    states[id] = { base: p.base, supPct: 0, upg: p.upg };
+    grid.appendChild(buildCard(p, id));
+  });
+}
+
+function buildCard(p, id) {
+  const el = document.createElement('div');
+  el.className = 'card reveal';
+  el.id = id;
+
+  const upgHTML = p.upg.map((u,i) => `
+    <label class="upg-item">
+      <input class="upg-check" type="checkbox" data-idx="${i}" onchange="calcPrice('${id}')">
+      <div>
+        <span class="upg-name">${u.n}</span>
+        <span class="upg-price">+ $${u.p.toLocaleString()}</span>
+      </div>
+    </label>
+  `).join('');
+
+  const termsIncl = TERMS_INCL.map(t=>`<li>${t}</li>`).join('');
+  const termsExcl = TERMS_EXCL.map(t=>`<li>${t}</li>`).join('');
+
+  el.innerHTML = `
+    <div class="card-top">
+      <div class="card-icon">${p.icon}</div>
+      <div class="card-name">${p.name}</div>
+      <div class="card-desc">${p.desc}</div>
+      <div class="base-tag">
+        <span>Desde</span>
+        <strong>$${p.base.toLocaleString()}</strong>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div class="upgrades-lbl">Mejoras Opcionales</div>
+      ${upgHTML}
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div class="support-lbl">Nivel de Soporte Mensual</div>
+      <div class="support-btns">
+        <button class="sup-btn active" data-pct="0"  onclick="setSup(this,'${id}')">Sin Soporte</button>
+        <button class="sup-btn"        data-pct="7"  onclick="setSup(this,'${id}')">Estándar 7%</button>
+        <button class="sup-btn"        data-pct="15" onclick="setSup(this,'${id}')">Premium 15%</button>
+      </div>
+    </div>
+    <div class="price-box" id="${id}-pricebox">
+      <div class="price-lbl">Inversión Total Estimada</div>
+      <div class="price-num" id="${id}-total">$${p.base.toLocaleString()}</div>
+      <div class="price-sup-note" id="${id}-supnote">Soporte seleccionado: $0</div>
+    </div>
+    <div>
+      <button class="terms-btn" id="${id}-tbtn" onclick="toggleTerms('${id}')">
+        Ver términos del contrato <span class="terms-arrow">↓</span>
+      </button>
+      <div class="terms-body" id="${id}-terms">
+        <div class="t-title t-inc">✓ &nbsp;Incluye</div>
+        <ul class="t-ul">${termsIncl}</ul>
+        <div class="t-title t-exc" style="margin-top:.5rem">✕ &nbsp;No Incluye</div>
+        <ul class="t-ul">${termsExcl}</ul>
+      </div>
+    </div>
+    <button class="hire-btn" onclick="openModal('${p.name.replace(/'/g,"\\'")}','${id}')">
+      Contratar Ahora
+    </button>
+  `;
+  return el;
+}
+
+/* ══════════════════════════════════════════
+   PRICE LOGIC
+══════════════════════════════════════════ */
+function calcPrice(id) {
+  const s = states[id];
+  const card = document.getElementById(id);
+  let extras = 0;
+  card.querySelectorAll('.upg-check:checked').forEach(cb => {
+    extras += s.upg[+cb.dataset.idx].p;
+  });
+  const subtotal = s.base + extras;
+  const supAmt = Math.round(subtotal * s.supPct / 100);
+  const total = subtotal + supAmt;
+
+  const el = document.getElementById(id + '-total');
+  el.textContent = '$' + total.toLocaleString();
+  document.getElementById(id + '-supnote').textContent =
+    'Soporte seleccionado: $' + supAmt.toLocaleString();
+
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+}
+
+function setSup(btn, id) {
+  const pct = +btn.dataset.pct;
+  states[id].supPct = pct;
+  btn.closest('.support-btns').querySelectorAll('.sup-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  calcPrice(id);
+}
+
+function toggleTerms(id) {
+  const body = document.getElementById(id + '-terms');
+  const btn  = document.getElementById(id + '-tbtn');
+  body.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+
+/* ══════════════════════════════════════════
+   MODE TOGGLE
+══════════════════════════════════════════ */
+function toggleMode() {
+  isApp = !isApp;
+  const body = document.body;
+  const track = document.getElementById('switchTrack');
+  const fl = document.getElementById('flash');
+  const sl = document.getElementById('sideLabel');
+
+  fl.classList.add('on');
+  setTimeout(() => fl.classList.remove('on'), 350);
+
+  if (isApp) {
+    body.classList.add('app-mode');
+    track.classList.add('on');
+    sl.textContent = 'App';
+    document.getElementById('heroBadge').innerHTML = '✦ &nbsp;Apps Mobile de Alta Gama · Exclusivo por Diseño';
+    document.getElementById('heroEm').textContent = 'apps que conquistan';
+    document.getElementById('heroSub').textContent = 'Aplicaciones mobile de primera clase que seducen a los usuarios y conquistan los primeros puestos de las tiendas de apps.';
+    document.getElementById('secEyebrow').textContent = 'Soluciones Mobile Premium';
+    document.getElementById('secTitle').innerHTML = 'Aplicaciones que<br>Redefinen lo Posible';
+    document.getElementById('secDesc').textContent = 'Apps nativas y cross-platform diseñadas para seducir a los usuarios y dominar el mercado con experiencias que generan adicción sana.';
+    document.getElementById('webGrid').style.display = 'none';
+    document.getElementById('appGrid').style.display = 'grid';
+  } else {
+    body.classList.remove('app-mode');
+    track.classList.remove('on');
+    sl.textContent = 'Web';
+    document.getElementById('heroBadge').innerHTML = '✦ &nbsp;Boutique de Software · Exclusivo por Diseño';
+    document.getElementById('heroEm').textContent = 'futuro digital';
+    document.getElementById('heroSub').textContent = 'Soluciones web y mobile de alta gama, diseñadas para marcas que no se conforman con lo ordinario. Cada línea de código es una declaración de excelencia.';
+    document.getElementById('secEyebrow').textContent = 'Soluciones Web Premium';
+    document.getElementById('secTitle').innerHTML = 'Arquitectura Digital<br>Sin Precedentes';
+    document.getElementById('secDesc').textContent = 'Cada proyecto es una obra de ingeniería diseñada para dominar su categoría. Precios transparentes, resultados extraordinarios.';
+    document.getElementById('webGrid').style.display = 'grid';
+    document.getElementById('appGrid').style.display = 'none';
+  }
+  observeCards();
+}
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+function openModal(name, cardId) {
+  const ov = document.getElementById('overlay');
+  document.getElementById('fService').value = name || '';
+  if (cardId) {
+    const el = document.getElementById(cardId + '-total');
+    if (el) document.getElementById('fBudget').value = el.textContent;
+  }
+  document.getElementById('formWrap').style.display = 'block';
+  document.getElementById('successBox').style.display = 'none';
+  document.getElementById('fName').value = '';
+  document.getElementById('fCompany').value = '';
+  document.getElementById('fMsg').value = '';
+  ov.classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+}
+
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function submitForm() {
+  const name    = document.getElementById('fName').value.trim();
+  const company = document.getElementById('fCompany').value.trim();
+  const service = document.getElementById('fService').value.trim();
+  const budget  = document.getElementById('fBudget').value.trim();
+  const msg     = document.getElementById('fMsg').value.trim();
+
+  if (!name || !company) {
+    document.getElementById('fName').focus();
+    document.getElementById('fName').style.borderColor = 'rgba(255,96,96,.6)';
+    return;
+  }
+  document.getElementById('fName').style.borderColor = '';
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  console.log('[Nexus Studio] Solicitud de contacto:', { name, company, service, budget, msg });
+
+  setTimeout(() => {
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('successBox').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Enviar Solicitud →';
+    setTimeout(closeModal, 4000);
+  }, 1400);
+}
+
+/* ══════════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════════ */
+function observeCards() {
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e,i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 70);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(el => { el.classList.remove('visible'); obs.observe(el); });
+}
+
+function scrollTo(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+buildGrid(WEB, 'webGrid');
+buildGrid(APP, 'appGrid');
+observeCards();
+
+document.querySelectorAll('.nav-links a').forEach(a => {
+  a.addEventListener('mouseenter', function() {
+    this.style.transition = 'color .2s';
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
